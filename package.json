@@ -1,0 +1,16 @@
+{
+  "name": "supershop-management-system",
+  "version": "1.0.0",
+  "description": "This project is a **production-ready Multi-Tenant Super Shop Inventory & Expiration Management System**. It addresses critical retail operations: user authentication, multi-tenant store data isolation, tracking stock at the granular batch level, enforcing **First-Expired, First-Out (FEFO)** stock deduction during transactions, and providing an executive dashboard for monitoring real-time inventory and upcoming expirations.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "workspaces": [
+    "apps/*"
+  ]
+}
