@@ -1,19 +1,12 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
-import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column, hasMany, beforeSave } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
-import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import Product from '#models/product'
 import Batch from '#models/batch'
 import Sale from '#models/sale'
 
-const AuthFinder = withAuthFinder(BaseModel, {
-  uids: ['email'],
-  passwordColumn: 'password',
-})
-
-export default class User extends compose(BaseModel, AuthFinder) {
+export default class User extends BaseModel {
   @column({ isPrimary: true })
   declare id: string
 
