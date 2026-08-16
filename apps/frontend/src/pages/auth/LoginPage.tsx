@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { LogIn, Loader2 } from 'lucide-react'
+import { LogIn, Loader2, Mail, Lock } from 'lucide-react'
 import { AxiosError } from 'axios'
 
 const LoginPage = () => {
@@ -24,44 +24,50 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 space-y-8 transform transition-all hover:scale-[1.01]">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-            <LogIn className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-2xl bg-linear-to-tr from-indigo-600 to-purple-600 shadow-lg -rotate-3 hover:rotate-0 transition-transform duration-300">
+            <LogIn className="h-9 w-9 text-white" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your store
+          <h2 className="mt-6 text-center text-3xl font-black tracking-tight text-gray-900">
+            Welcome Back
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              register a new store
-            </Link>
+          <p className="mt-2 text-center text-sm text-gray-500 font-medium">
+            Sign in to manage your store inventory
           </p>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
+            <div className="rounded-xl bg-red-50 p-4 border border-red-100 animate-bounce-short">
+              <div className="text-sm text-red-600 font-semibold text-center">{error}</div>
             </div>
           )}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
+
+          <div className="space-y-4">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                <Mail className="h-5 w-5" />
+              </div>
               <input
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="block w-full pl-10 pr-3 py-3 border-2 border-gray-100 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-hidden focus:bg-white focus:ring-0 focus:border-indigo-500 transition-all sm:text-sm font-medium"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                <Lock className="h-5 w-5" />
+              </div>
               <input
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="block w-full pl-10 pr-3 py-3 border-2 border-gray-100 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-hidden focus:bg-white focus:ring-0 focus:border-indigo-500 transition-all sm:text-sm font-medium"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -69,20 +75,29 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <div>
+          <div className="pt-2">
             <button
               type="submit"
               disabled={isLoggingIn}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 shadow-lg hover:shadow-indigo-200/50 disabled:opacity-50"
             >
               {isLoggingIn ? (
-                <Loader2 className="animate-spin h-5 w-5" />
+                <Loader2 className="animate-spin h-5 w-5 text-white" />
               ) : (
-                'Sign in'
+                'Sign In'
               )}
             </button>
           </div>
         </form>
+
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-500 font-medium">
+            Don't have a store yet?{' '}
+            <Link to="/register" className="text-indigo-600 hover:text-indigo-500 font-bold transition-colors">
+              Register here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
