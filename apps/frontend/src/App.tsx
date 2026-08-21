@@ -3,6 +3,11 @@ import { useAuth } from './hooks/useAuth'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import { Loader2 } from 'lucide-react'
+import { Layout } from './components/Layout'
+import { DashboardPage } from './pages/dashboard/DashboardPage'
+import { ProductsPage } from './pages/inventory/ProductsPage'
+import { POSPage } from './pages/sales/POSPage'
+import { BulkIntakePage } from './pages/inventory/BulkIntakePage'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -28,15 +33,48 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      
+
+      {/* Scoped Dashboard inside Layout wrapping */}
       <Route
         path="/"
         element={
           <ProtectedRoute>
-            <div className="p-8">
-              <h1 className="text-2xl font-bold">Welcome to your Super Shop Dashboard</h1>
-              <p className="mt-4 text-gray-600">Inventory management features coming soon...</p>
-            </div>
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ProductsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/pos"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <POSPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/bulk-intake"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <BulkIntakePage />
+            </Layout>
           </ProtectedRoute>
         }
       />

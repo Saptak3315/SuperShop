@@ -8,4 +8,18 @@ export interface ApiDefinition {
     logout: typeof routes['auth.logout']
     me: typeof routes['auth.me']
   }
+  inventory: {
+    createProduct: typeof routes['inventory.create_product']
+    listProducts: typeof routes['inventory.list_products']
+    createBatch: typeof routes['inventory.create_batch']
+    createBatchesBulk: typeof routes['inventory.create_batches_bulk']
+    expiringBatches: typeof routes['inventory.expiring_batches']
+  }
+  sales: {
+    checkout: typeof routes['sales.checkout']
+  }
+  dashboard: {
+    summary: typeof routes['dashboard.summary']
+    expiringChart: typeof routes['dashboard.expiring_chart']
+  }
 }
