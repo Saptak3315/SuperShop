@@ -156,14 +156,14 @@ export const POSPage = () => {
     // This is extremely smart and accurate!
     return cart.reduce((sum, item) => {
       const activeBatches = (item.product as ProductExtended).batches || []
-      const price = activeBatches[0]?.sellingPrice || 0
+      const price = Number(activeBatches[0]?.sellingPrice || 0)
       return sum + price * item.quantity
     }, 0)
   }
 
   const getProductPrice = (product: Product) => {
     const activeBatches = (product as ProductExtended).batches || []
-    return activeBatches[0]?.sellingPrice || 0
+    return Number(activeBatches[0]?.sellingPrice || 0)
   }
 
   const handleCheckout = async () => {
@@ -211,7 +211,7 @@ export const POSPage = () => {
             <div>
               <h3 className="font-bold text-green-950 text-base">Checkout Processed Successfully!</h3>
               <p className="text-xs text-green-800 mt-1 font-mono">Invoice No: {successOrder.invoiceNo}</p>
-              <p className="text-xs text-green-800 font-medium">Total Amount Deducted: ${successOrder.totalAmount.toFixed(2)}</p>
+              <p className="text-xs text-green-800 font-medium">Total Amount Deducted: ${Number(successOrder.totalAmount).toFixed(2)}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
