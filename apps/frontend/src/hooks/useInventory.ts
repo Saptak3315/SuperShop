@@ -23,6 +23,30 @@ export const useInventory = () => {
     },
   })
 
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
+      const response = await api.put(`/api/inventory/products/${id}`, data)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-chart'] })
+    },
+  })
+
+  const deleteProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await api.delete(`/api/inventory/products/${id}`)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-chart'] })
+    },
+  })
+
   // Batches
   const createBatchMutation = useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
@@ -63,6 +87,10 @@ export const useInventory = () => {
     isLoadingProducts: productsQuery.isLoading,
     createProduct: createProductMutation.mutateAsync,
     isCreatingProduct: createProductMutation.isPending,
+    updateProduct: updateProductMutation.mutateAsync,
+    isUpdatingProduct: updateProductMutation.isPending,
+    deleteProduct: deleteProductMutation.mutateAsync,
+    isDeletingProduct: deleteProductMutation.isPending,
     createBatch: createBatchMutation.mutateAsync,
     isCreatingBatch: createBatchMutation.isPending,
     createBatchesBulk: createBatchesBulkMutation.mutateAsync,

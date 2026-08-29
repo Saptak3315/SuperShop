@@ -11,6 +11,8 @@ export interface ApiDefinition {
   inventory: {
     createProduct: typeof routes['inventory.create_product']
     listProducts: typeof routes['inventory.list_products']
+    updateProduct: typeof routes['inventory.update_product']
+    deleteProduct: typeof routes['inventory.delete_product']
     createBatch: typeof routes['inventory.create_batch']
     createBatchesBulk: typeof routes['inventory.create_batches_bulk']
     expiringBatches: typeof routes['inventory.expiring_batches']

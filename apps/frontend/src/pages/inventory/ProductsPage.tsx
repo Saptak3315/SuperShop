@@ -7,6 +7,8 @@ import {
   AlertCircle,
   PlusCircle,
   X,
+  Edit,
+  Trash2,
 } from 'lucide-react'
 
 interface Product {
@@ -41,6 +43,10 @@ export const ProductsPage = () => {
     isLoadingProducts,
     createProduct,
     isCreatingProduct,
+    updateProduct,
+    isUpdatingProduct,
+    deleteProduct,
+    isDeletingProduct,
     createBatch,
     isCreatingBatch,
   } = useInventory() as {
@@ -48,6 +54,10 @@ export const ProductsPage = () => {
     isLoadingProducts: boolean
     createProduct: (data: Record<string, unknown>) => Promise<unknown>
     isCreatingProduct: boolean
+    updateProduct: (payload: { id: string; data: Record<string, unknown> }) => Promise<unknown>
+    isUpdatingProduct: boolean
+    deleteProduct: (id: string) => Promise<unknown>
+    isDeletingProduct: boolean
     createBatch: (data: Record<string, unknown>) => Promise<unknown>
     isCreatingBatch: boolean
   }
@@ -55,9 +65,20 @@ export const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedProductForBatch, setSelectedProductForBatch] = useState<Product | null>(null)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [selectedProductForEdit, setSelectedProductForEdit] = useState<Product | null>(null)
+  const [selectedProductForDelete, setSelectedProductForDelete] = useState<Product | null>(null)
 
   // Product Form State
   const [productForm, setProductForm] = useState({
+    name: '',
+    barcode: '',
+    category: '',
+    unit: 'pcs',
+    minStockAlert: 10,
+  })
+
+  // Edit Product Form State
+  const [editProductForm, setEditProductForm] = useState({
     name: '',
     barcode: '',
     category: '',
@@ -99,6 +120,41 @@ export const ProductsPage = () => {
     } catch (err) {
       const apiErr = err as ApiError
       setErrorMsg(apiErr.response?.data?.message || 'Failed to register product')
+    }
+  }
+
+  const handleProductEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedProductForEdit) return
+    setErrorMsg('')
+    setSuccessMsg('')
+    try {
+      await updateProduct({
+        id: selectedProductForEdit.id,
+        data: {
+          ...editProductForm,
+          minStockAlert: Number(editProductForm.minStockAlert),
+        },
+      })
+      setSuccessMsg('Product updated successfully!')
+      setSelectedProductForEdit(null)
+    } catch (err) {
+      const apiErr = err as ApiError
+      setErrorMsg(apiErr.response?.data?.message || 'Failed to update product')
+    }
+  }
+
+  const handleProductDelete = async () => {
+    if (!selectedProductForDelete) return
+    setErrorMsg('')
+    setSuccessMsg('')
+    try {
+      await deleteProduct(selectedProductForDelete.id)
+      setSuccessMsg('Product deleted successfully!')
+      setSelectedProductForDelete(null)
+    } catch (err) {
+      const apiErr = err as ApiError
+      setErrorMsg(apiErr.response?.data?.message || 'Failed to delete product')
     }
   }
 
@@ -254,17 +310,51 @@ export const ProductsPage = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => {
-                            setErrorMsg('')
-                            setSuccessMsg('')
-                            setSelectedProductForBatch(product)
-                          }}
-                          className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-800 font-bold text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                          <span>Add Batch</span>
-                        </button>
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => {
+                              setErrorMsg('')
+                              setSuccessMsg('')
+                              setSelectedProductForBatch(product)
+                            }}
+                            className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-800 font-bold text-xs bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            title="Add Stock Batch"
+                          >
+                            <PlusCircle className="h-4 w-4" />
+                            <span>Add Batch</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setErrorMsg('')
+                              setSuccessMsg('')
+                              setEditProductForm({
+                                name: product.name,
+                                barcode: product.barcode,
+                                category: product.category || '',
+                                unit: product.unit || 'pcs',
+                                minStockAlert: product.minStockAlert,
+                              })
+                              setSelectedProductForEdit(product)
+                            }}
+                            className="inline-flex items-center space-x-1 text-amber-600 hover:text-amber-800 font-bold text-xs bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            title="Edit Product"
+                          >
+                            <Edit className="h-4 w-4" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setErrorMsg('')
+                              setSuccessMsg('')
+                              setSelectedProductForDelete(product)
+                            }}
+                            className="inline-flex items-center space-x-1 text-red-600 hover:text-red-800 font-bold text-xs bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span>Delete</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -275,7 +365,159 @@ export const ProductsPage = () => {
         </div>
       </div>
 
-      {/* Register Product Modal */}
+      {/* Edit Product Modal */}
+      {selectedProductForEdit && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">Edit Product</h3>
+              <button
+                onClick={() => setSelectedProductForEdit(null)}
+                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleProductEditSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editProductForm.name}
+                  onChange={(e) => setEditProductForm({ ...editProductForm, name: e.target.value })}
+                  placeholder="e.g. Fresh Milk 1L"
+                  className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-blue-500 text-gray-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                  Barcode *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editProductForm.barcode}
+                  onChange={(e) => setEditProductForm({ ...editProductForm, barcode: e.target.value })}
+                  placeholder="Scan or enter item barcode"
+                  className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-blue-500 text-gray-900 font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    value={editProductForm.category}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, category: e.target.value })}
+                    placeholder="e.g. Dairy"
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Unit Type
+                  </label>
+                  <select
+                    value={editProductForm.unit}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, unit: e.target.value })}
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-blue-500 text-gray-900"
+                  >
+                    <option value="pcs">pcs (pieces)</option>
+                    <option value="kg">kg (kilograms)</option>
+                    <option value="ltr">ltr (liters)</option>
+                    <option value="box">box</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                  Min Stock Alert Threshold
+                </label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  value={editProductForm.minStockAlert}
+                  onChange={(e) =>
+                    setEditProductForm({ ...editProductForm, minStockAlert: Number(e.target.value) })
+                  }
+                  className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-blue-500 text-gray-900"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 flex items-center justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProductForEdit(null)}
+                  className="px-4 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingProduct}
+                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold rounded-xl shadow-sm cursor-pointer transition-colors"
+                >
+                  {isUpdatingProduct ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {selectedProductForDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-red-50">
+              <h3 className="text-lg font-bold text-red-900">Delete Product</h3>
+              <button
+                onClick={() => setSelectedProductForDelete(null)}
+                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-600">
+                Are you sure you want to delete <strong className="text-gray-900">{selectedProductForDelete.name}</strong>?
+                This action is irreversible and will soft-delete the product from your inventory.
+              </p>
+
+              <div className="pt-4 border-t border-gray-100 flex items-center justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProductForDelete(null)}
+                  className="px-4 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleProductDelete}
+                  disabled={isDeletingProduct}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white text-sm font-semibold rounded-xl shadow-sm cursor-pointer transition-colors"
+                >
+                  {isDeletingProduct ? 'Deleting...' : 'Delete Product'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isProductModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">

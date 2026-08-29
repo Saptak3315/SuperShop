@@ -79,6 +79,30 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'inventory.update_product': {
+    methods: ["PUT"]
+    pattern: '/api/inventory/products/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'inventory.delete_product': {
+    methods: ["DELETE"]
+    pattern: '/api/inventory/products/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'inventory.create_batch': {
     methods: ["POST"]
     pattern: '/api/inventory/batches'

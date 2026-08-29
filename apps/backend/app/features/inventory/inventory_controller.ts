@@ -3,6 +3,7 @@ import { inject } from '@adonisjs/core'
 import InventoryService from './inventory_service.js'
 import {
   createProductValidator,
+  updateProductValidator,
   createBatchValidator,
   createBulkBatchesValidator,
 } from './inventory_validator.js'
@@ -20,6 +21,29 @@ export default class InventoryController {
     const product = await this.inventoryService.createProduct(user, payload)
 
     return response.created(product)
+  }
+
+  /**
+   * Update an existing product
+   */
+  public async updateProduct({ request, response, auth }: HttpContext) {
+    const user = auth.use('web').user!
+    const productId = request.param('id')
+    const payload = await request.validateUsing(updateProductValidator)
+    const product = await this.inventoryService.updateProduct(user, productId, payload)
+
+    return response.ok(product)
+  }
+
+  /**
+   * Delete a product
+   */
+  public async deleteProduct({ request, response, auth }: HttpContext) {
+    const user = auth.use('web').user!
+    const productId = request.param('id')
+    const product = await this.inventoryService.deleteProduct(user, productId)
+
+    return response.ok(product)
   }
 
   /**

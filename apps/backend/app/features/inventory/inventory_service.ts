@@ -22,6 +22,43 @@ export default class InventoryService {
   }
 
   /**
+   * Update an existing product
+   */
+  public async updateProduct(user: User, productId: string, data: any) {
+    const product = await Product.query()
+      .where('id', productId)
+      .where('user_id', user.id)
+      .whereNull('deleted_at')
+      .firstOrFail()
+
+    product.merge({
+      barcode: data.barcode,
+      name: data.name,
+      category: data.category,
+      unit: data.unit,
+      minStockAlert: data.minStockAlert,
+    })
+
+    await product.save()
+    return product
+  }
+
+  /**
+   * Soft-delete a product
+   */
+  public async deleteProduct(user: User, productId: string) {
+    const product = await Product.query()
+      .where('id', productId)
+      .where('user_id', user.id)
+      .whereNull('deleted_at')
+      .firstOrFail()
+
+    product.deletedAt = DateTime.now()
+    await product.save()
+    return product
+  }
+
+  /**
    * List products for a user with total stock
    */
   public async listProducts(user: User) {

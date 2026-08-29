@@ -14,6 +14,19 @@ export const createProductValidator = vine.compile(
 )
 
 /**
+ * Validator for updating a product
+ */
+export const updateProductValidator = vine.compile(
+  vine.object({
+    barcode: vine.string().trim().maxLength(100),
+    name: vine.string().trim().maxLength(255),
+    category: vine.string().trim().maxLength(100).nullable().optional(),
+    unit: vine.string().trim().maxLength(50).nullable().optional(),
+    minStockAlert: vine.number().positive().optional(),
+  })
+)
+
+/**
  * Validator for creating a new batch
  */
 export const createBatchValidator = vine.compile(

@@ -10,6 +10,8 @@ export type ScannedRoutes = {
     'auth.me': { paramsTuple?: []; params?: {} }
     'inventory.create_product': { paramsTuple?: []; params?: {} }
     'inventory.list_products': { paramsTuple?: []; params?: {} }
+    'inventory.update_product': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.delete_product': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.create_batch': { paramsTuple?: []; params?: {} }
     'inventory.create_batches_bulk': { paramsTuple?: []; params?: {} }
     'inventory.expiring_batches': { paramsTuple?: []; params?: {} }
@@ -39,6 +41,12 @@ export type ScannedRoutes = {
     'inventory.create_batch': { paramsTuple?: []; params?: {} }
     'inventory.create_batches_bulk': { paramsTuple?: []; params?: {} }
     'sales.checkout': { paramsTuple?: []; params?: {} }
+  }
+  PUT: {
+    'inventory.update_product': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  DELETE: {
+    'inventory.delete_product': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

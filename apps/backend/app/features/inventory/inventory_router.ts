@@ -9,6 +9,8 @@ export default function inventoryRoutes() {
       // Product routes
       router.post('products', [InventoryController, 'createProduct'])
       router.get('products', [InventoryController, 'listProducts'])
+      router.put('products/:id', [InventoryController, 'updateProduct'])
+      router.delete('products/:id', [InventoryController, 'deleteProduct'])
 
       // Batch routes
       router.post('batches', [InventoryController, 'createBatch'])

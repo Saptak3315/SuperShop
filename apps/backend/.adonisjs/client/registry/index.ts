@@ -42,6 +42,18 @@ const routes = {
     tokens: [{"old":"/api/inventory/products","type":0,"val":"api","end":""},{"old":"/api/inventory/products","type":0,"val":"inventory","end":""},{"old":"/api/inventory/products","type":0,"val":"products","end":""}],
     types: placeholder as Registry['inventory.list_products']['types'],
   },
+  'inventory.update_product': {
+    methods: ["PUT"],
+    pattern: '/api/inventory/products/:id',
+    tokens: [{"old":"/api/inventory/products/:id","type":0,"val":"api","end":""},{"old":"/api/inventory/products/:id","type":0,"val":"inventory","end":""},{"old":"/api/inventory/products/:id","type":0,"val":"products","end":""},{"old":"/api/inventory/products/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['inventory.update_product']['types'],
+  },
+  'inventory.delete_product': {
+    methods: ["DELETE"],
+    pattern: '/api/inventory/products/:id',
+    tokens: [{"old":"/api/inventory/products/:id","type":0,"val":"api","end":""},{"old":"/api/inventory/products/:id","type":0,"val":"inventory","end":""},{"old":"/api/inventory/products/:id","type":0,"val":"products","end":""},{"old":"/api/inventory/products/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['inventory.delete_product']['types'],
+  },
   'inventory.create_batch': {
     methods: ["POST"],
     pattern: '/api/inventory/batches',
