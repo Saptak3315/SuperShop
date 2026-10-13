@@ -49,9 +49,18 @@ export default class InventoryController {
   /**
    * List all products with their aggregate stock
    */
-  public async listProducts({ response, auth }: HttpContext) {
+  public async listProducts({ request, response, auth }: HttpContext) {
     const user = auth.use('web').user!
-    const products = await this.inventoryService.listProducts(user)
+    const page = request.input('page', 1)
+    const limit = request.input('limit', 20)
+    const search = request.input('search')
+
+    const products = await this.inventoryService.listProducts(
+      user,
+      Number(page),
+      Number(limit),
+      search
+    )
 
     return response.ok(products)
   }
