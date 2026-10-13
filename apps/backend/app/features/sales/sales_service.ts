@@ -26,7 +26,10 @@ export default class SalesService {
       let totalAmount = 0
       const saleItemsToInsert: any[] = []
 
-      for (const item of data.items) {
+      // 1. Sort items by productId to prevent deadlocks
+      const sortedItems = [...data.items].sort((a, b) => a.productId.localeCompare(b.productId))
+
+      for (const item of sortedItems) {
         let neededQuantity = item.quantity
 
         // Enforce strict user_id scope, active stock, non-expired, and lock rows using forUpdate()

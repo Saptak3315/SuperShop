@@ -61,21 +61,33 @@ export default class InventoryService {
   /**
    * List products for a user with total stock
    */
-  public async listProducts(user: User) {
-    const products = await Product.query()
-      .where('user_id', user.id)
-      .whereNull('deleted_at')
-      .preload('batches', (query) => {
-        query.where('status', 'ACTIVE').where('quantity', '>', 0)
-      })
+  public async listProducts(user: User, page: number = 1, limit: number = 20, search?: string) {
+    const now = DateTime.now()
+    const query = Product.query().where('user_id', user.id).whereNull('deleted_at')
 
-    return products.map((product) => {
-      const totalStock = product.batches.reduce((sum, batch) => sum + batch.quantity, 0)
-      return {
-        ...product.toJSON(),
-        totalStock,
-      }
-    })
+    if (search) {
+      query.where('name', 'LIKE', `%${search}%`)
+    }
+
+    const productsPagination = await query
+      .preload('batches', (bQuery) => {
+        bQuery
+          .where('status', 'ACTIVE')
+          .where('quantity', '>', 0)
+          .where('expiry_date', '>', now.toSQLDate()!)
+      })
+      .paginate(page, limit)
+
+    return {
+      ...productsPagination.toJSON(),
+      data: productsPagination.all().map((product) => {
+        const totalStock = product.batches.reduce((sum, batch) => sum + batch.quantity, 0)
+        return {
+          ...product.toJSON(),
+          totalStock,
+        }
+      }),
+    }
   }
 
   /**

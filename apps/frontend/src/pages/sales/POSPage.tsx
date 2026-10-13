@@ -39,8 +39,26 @@ interface ApiError {
 }
 
 export const POSPage = () => {
-  const { products, isLoadingProducts } = useInventory() as {
+  const {
+    products,
+    pagination,
+    page,
+    setPage,
+    searchTerm,
+    setSearchTerm,
+    isLoadingProducts,
+  } = useInventory() as {
     products: Product[]
+    pagination: {
+      total: number
+      per_page: number
+      current_page: number
+      last_page: number
+    }
+    page: number
+    setPage: (page: number) => void
+    searchTerm: string
+    setSearchTerm: (search: string) => void
     isLoadingProducts: boolean
   }
   const { checkout, isCheckingOut } = useSales()
@@ -269,6 +287,40 @@ export const POSPage = () => {
 
           {/* Touch-click Product Selection Grid */}
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+            {/* Product Name Search Input & Pagination */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="relative w-full">
+                <Search className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search products by name..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 text-gray-900"
+                />
+              </div>
+              {pagination && pagination.last_page > 1 && (
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  <button
+                    disabled={page <= 1}
+                    onClick={() => setPage(page - 1)}
+                    className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold disabled:opacity-50 hover:bg-gray-50 cursor-pointer"
+                  >
+                    Prev
+                  </button>
+                  <span className="text-xs text-gray-600 font-medium">
+                    {pagination.current_page} / {pagination.last_page}
+                  </span>
+                  <button
+                    disabled={page >= pagination.last_page}
+                    onClick={() => setPage(page + 1)}
+                    className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold disabled:opacity-50 hover:bg-gray-50 cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
             <h3 className="font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
               <Search className="h-5 w-5 text-gray-500" />
               <span>Selectable Active Stock</span>
