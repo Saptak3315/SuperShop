@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import Sale from '#models/sale'
 import SaleItem from '#models/sale_item'
 import Batch from '#models/batch'
+import OutboxEvent from '#models/outbox_event'
 import type User from '#models/user'
 import { Exception } from '@adonisjs/core/exceptions'
 
@@ -98,6 +99,35 @@ export default class SalesService {
       for (const itemData of saleItemsToInsert) {
         await SaleItem.create(itemData, { client: trx })
       }
+
+      await OutboxEvent.create(
+        {
+          id: uuidv4(),
+          eventType: 'SALE_COMPLETED',
+          payload: {
+            saleId,
+            invoiceNo,
+            userId: user.id,
+            totalAmount: Number(totalAmount.toFixed(2)),
+            paymentMethod: data.paymentMethod,
+            itemCount: saleItemsToInsert.length,
+            items: saleItemsToInsert.map((si) => ({
+              productId: si.productId,
+              batchId: si.batchId,
+              quantity: si.quantity,
+              unitPrice: si.unitPrice,
+              subtotal: si.subtotal,
+            })),
+            occurredAt: DateTime.now().toISO(),
+          },
+          status: 'PENDING',
+          attempts: 0,
+          errorMessage: null,
+          processedAt: null,
+        },
+        { client: trx }
+      )
+      // ────────────────────────────────────────────────────────────────────
 
       await trx.commit()
 
