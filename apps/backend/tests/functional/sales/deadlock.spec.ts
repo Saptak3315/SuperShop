@@ -7,13 +7,6 @@ import SalesService from '#features/sales/sales_service'
 import { DateTime } from 'luxon'
 import { v4 as uuidv4 } from 'uuid'
 
-/**
- * Stress Test: High-concurrency deadlock immunity under sustained load.
- *
- * Fires N=10 concurrent checkouts over two shared products in opposing lock
- * orders. The deterministic UUID sort in SalesService must prevent any
- * circular lock-wait cycle (SQLSTATE 40P01) across all threads.
- */
 test.group('SalesService | Stress: High-Concurrency Deadlock Immunity', (group) => {
   let user: User
   const p1Id = uuidv4()
@@ -79,7 +72,6 @@ test.group('SalesService | Stress: High-Concurrency Deadlock Immunity', (group) 
     const salesService = new SalesService()
     const CONCURRENCY = 10
 
-    // Build concurrent requests alternating lock order: even → [P1,P2], odd → [P2,P1]
     const requests = Array.from({ length: CONCURRENCY }, (_, i) =>
       salesService.checkout(user, {
         paymentMethod: 'CASH',
@@ -96,7 +88,6 @@ test.group('SalesService | Stress: High-Concurrency Deadlock Immunity', (group) 
       })
     )
 
-    // All 10 requests must resolve — no deadlock abort, no unhandled rejection
     const results = await Promise.allSettled(requests)
     const fulfilled = results.filter((r) => r.status === 'fulfilled')
     const deadlocks = results.filter(
@@ -107,7 +98,6 @@ test.group('SalesService | Stress: High-Concurrency Deadlock Immunity', (group) 
     assert.equal(fulfilled.length, CONCURRENCY, 'All 10 concurrent requests must succeed')
     assert.equal(deadlocks.length, 0, 'Zero deadlock exceptions must be thrown')
 
-    // Verify total stock deducted equals CONCURRENCY × 1 per product
     const b1 = await Batch.findOrFail(b1Id)
     const b2 = await Batch.findOrFail(b2Id)
     assert.equal(b1.quantity, 10000 - CONCURRENCY, 'Product A stock must reflect exact deductions')
