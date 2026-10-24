@@ -38,6 +38,27 @@ export class BatchSchema extends BaseModel {
   declare userId: string
 }
 
+export class OutboxEventSchema extends BaseModel {
+  static $columns = ['attempts', 'createdAt', 'errorMessage', 'eventType', 'id', 'payload', 'processedAt', 'status'] as const
+  $columns = OutboxEventSchema.$columns
+  @column()
+  declare attempts: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare errorMessage: string | null
+  @column()
+  declare eventType: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare payload: string
+  @column.dateTime()
+  declare processedAt: DateTime | null
+  @column()
+  declare status: string
+}
+
 export class ProductSchema extends BaseModel {
   static $columns = ['barcode', 'category', 'createdAt', 'deletedAt', 'id', 'minStockAlert', 'name', 'unit', 'updatedAt', 'userId'] as const
   $columns = ProductSchema.$columns
